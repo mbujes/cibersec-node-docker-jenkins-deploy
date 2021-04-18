@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                sh 'rm -r node-hola'
+                sh 'rm -r cibersec-node-docker-jenkins-deploy'
                 sh 'apk add --no-cache git'
                 sh 'git clone https://github.com/mbujes/cibersec-node-docker-jenkins-deploy/'
             }
