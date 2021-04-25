@@ -27,5 +27,20 @@ pipeline {
           }
         }
       }
+      stage('Deploy') {
+        agent {
+          label 'node-server'
+              
+        }
+        steps {
+          // sh 'rm -r cibersec-node-docker-jenkins-deploy'
+          sh 'apk add --no-cache git'
+          sh 'git clone https://github.com/mbujes/cibersec-node-docker-jenkins-deploy/'
+          sh "npm install"
+          sh 'node index.js'
+        }
+      }
+
     }
 }
+
