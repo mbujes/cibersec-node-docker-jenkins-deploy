@@ -1,46 +1,33 @@
 pipeline {
-    agent {
-      docker {
-        image 'node:lts-alpine3.10' 
-        args '-p 3000:3000 -u root:root'
-      }
-    }
+    agent any;
     stages {
-      stage('Clone') {
+      stage('Test') {
+        agent {
+          docker {
+            image 'node:lts-alpine3.10' 
+            args '-p 3000:3000 -u root:root'
+          }
+        }
         steps {
-          sh 'rm -r cibersec-node-docker-jenkins-deploy'
+          sh 'rm -rf cibersec-node-docker-jenkins-deploy'
           sh 'apk add --no-cache git'
           sh 'git clone https://github.com/mbujes/cibersec-node-docker-jenkins-deploy/'
-        }
-      }
-      stage('NPM install') { 
-        steps {
           dir("cibersec-node-docker-jenkins-deploy") {
               sh "npm install"
           }
-        }
-      }
-      stage('Check tests') {
-        steps {
           dir("cibersec-node-docker-jenkins-deploy") {
             sh "npm run test"
           }
         }
       }
-      stage('Deploy') {
-        agent {
-          label 'node-server'
-              
-        }
+      stage('Deploy') { 
         steps {
-          // sh 'rm -r cibersec-node-docker-jenkins-deploy'
-          sh 'apk add --no-cache git'
-          sh 'git clone https://github.com/mbujes/cibersec-node-docker-jenkins-deploy/'
-          sh "npm install"
-          sh 'node index.js'
+          dir("cibersec-node-docker-jenkins-deploy") {
+            sh 'docker build -t nodejs-production .'
+            sh 'docker run -d -p 3100:3000 --name nodejs-production nodejs-production'
+          }
         }
       }
-
     }
 }
 
